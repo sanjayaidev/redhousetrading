@@ -1,0 +1,88 @@
+{
+  "settings": {
+    "title": "Red House Trading",
+    "tagline": "Building Foundations, Delivering Excellence Since 1999.",
+    "logoUrl": ""
+  },
+  "theme": {
+    "accent": "#b91c1c",
+    "background": "#faf7f5",
+    "surface": "#ffffff",
+    "text": "#1f1a17"
+  },
+  "contact": {
+    "address": "",
+    "phone": "",
+    "mobile": "",
+    "email": "",
+    "hours": "",
+    "mapUrl": "",
+    "mapPointer": ""
+  },
+  "home": {
+    "headline": "Red House Trading: Building Foundations, Delivering Excellence Since 1999.",
+    "sub": "Rooted in Jeddah and trusted across KSA for over two decades, Red House delivers market-leading solutions across trading, contracting, professional catering, and digital services. We combine long-standing local expertise with modern execution to power your business growth.",
+    "cta": "Explore Our Divisions",
+    "overviewTitle": "Our Divisional Ecosystem"
+  },
+  "about": {
+    "legacyTitle": "Our Legacy & Footprint",
+    "legacy": "Established in 1999, Red House began its journey with a singular commitment to quality and integrity. Over the past two decades, our core success has been deeply tied to the growth of Jeddah, Saudi Arabia, where we have built an unshakeable reputation as a premier multi-divisional partner. From our historical foundations in trading and contracting to our digital evolutionary steps, we have consistently moved alongside Vision 2030 to empower local businesses, industries, and communities.",
+    "nextTitle": "The Next Chapter: Hospitality & Growth",
+    "next": "Building directly upon the culinary reputation and operational excellence of our established, high-end dining restaurant, Red House has proudly launched its specialized Food Catering Division. This milestone marks the beginning of our grand forward-looking expansion strategy.",
+    "futureTitle": "Future Plans: Thinking Big",
+    "future": "At Red House, we are thinking big. Our immediate roadmap focuses on scaling our industrial, corporate, and event catering services across the entire Western Region of KSA. By scaling our infrastructure, supply lines, and central kitchens from Jeddah outward, we aim to become the premier hospitality and food service partner for major developments, corporate sectors, and mega-projects across the West Coast.",
+    "mission": "To deliver high-quality trading, contracting, and catering services across KSA using modern digital systems and local Saudi talent.",
+    "vision": "To expand from our Jeddah stronghold and become the leading multi-sector service enterprise across Western Saudi Arabia."
+  },
+  "contactPage": {
+    "headline": "Partner With Red House Today"
+  },
+  "services": [
+    {
+      "id": "trading",
+      "title": "Trading Division",
+      "summary": "Premium sourcing and rock-solid supply chain distribution networks across the Kingdom.",
+      "description": "Red House provides robust commercial trade networks and dependable material logistics designed to keep critical local industries running without interruption.",
+      "points": [
+        { "title": "Supply Chain Sourcing", "text": "Comprehensive wholesale procurement and domestic delivery management systems." },
+        { "title": "Bulk Product Distribution", "text": "Efficient inventory pipelines tailored specifically to industrial, construction, and commercial enterprise demands." },
+        { "title": "Local Market Expertise", "text": "Over two decades of logistical experience navigating Saudi customs, compliance frameworks, and distribution loops." }
+      ]
+    },
+    {
+      "id": "contracting",
+      "title": "Contracting Division",
+      "summary": "High-quality civil, structural, and engineering project execution backed by 20+ years of trust.",
+      "description": "With a legacy stretching back to 1999, our contracting arm is a trusted name in transforming blueprints into resilient local infrastructure.",
+      "points": [
+        { "title": "Civil & Structural Works", "text": "General contracting, commercial builds, and precise engineering execution across Jeddah." },
+        { "title": "Project Management Excellence", "text": "Turnkey oversight managing timelines, budgets, structural engineering, and procurement workflows." },
+        { "title": "HSE Strict Compliance", "text": "Total alignment with international structural regulations and Saudi construction safety guidelines to ensure zero-accident work sites." }
+      ]
+    },
+    {
+      "id": "catering",
+      "title": "Catering Division",
+      "summary": "Commercial and industrial hospitality born from our successful dining restaurant, built to scale.",
+      "description": "Born directly out of our popular, successful dining restaurant, the Red House Catering Division scales master-class culinary experiences to large-scale operations.",
+      "points": [
+        { "title": "Industrial & Corporate Hospitality", "text": "Reliable, nutritional, and large-scale meal planning for labor complexes, executive corporate parks, and institutional operations." },
+        { "title": "Event & Commercial Fine Catering", "text": "Full-service culinary staging for premium business gatherings, conferences, and private functions." },
+        { "title": "Strict Quality Assurance", "text": "Operating out of top-tier central kitchen facilities with rigid food safety alignments (HACCP principles) to guarantee culinary hygiene and authentic taste at scale." }
+      ]
+    },
+    {
+      "id": "online",
+      "title": "Online Services",
+      "summary": "Next-generation enterprise portals, seamless digital tracking, and remote client management.",
+      "description": "We bridge the gap between traditional operations and digital optimization, providing our clients with unprecedented transparency and remote oversight.",
+      "points": [
+        { "title": "Client Enterprise Portals", "text": "Secure digital dashboards allowing clients to view orders, track active contract milestones, and download invoices instantly." },
+        { "title": "Digital Catering & Procurement Hubs", "text": "Streamlined online interfaces to request custom quotes, modify meal plans, or place bulk trade orders." },
+        { "title": "Dedicated Web Support", "text": "Round-the-clock remote troubleshooting and digital account management frameworks for all corporate partners." }
+      ]
+    }
+  ],
+  "products": []
+}
