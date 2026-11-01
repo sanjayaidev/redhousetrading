@@ -6,7 +6,7 @@
   const uid = (p) => p + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 
   const DEFAULT_THEME = { accent: '#b91c1c', background: '#faf7f5', surface: '#ffffff', text: '#1f1a17' };
-  const S = { token: sessionStorage.getItem('rh_token') || '', data: null, dirty: false, tab: 'site' };
+  const S = { token: sessionStorage.getItem('rh_token') || '', data: null, dirty: false, tab: 'site', csvMode: 'merge', csvPlan: null };
 
   /* ---------- small utilities ---------- */
   let toastTimer;
@@ -53,7 +53,7 @@
     $('#pw').focus();
   }
   function signOut(msg) {
-    S.token = ''; sessionStorage.removeItem('rh_token'); S.data = null; setDirty(false);
+    S.token = ''; sessionStorage.removeItem('rh_token'); S.data = null; S.csvPlan = null; setDirty(false);
     showLogin(msg);
   }
 
@@ -221,8 +221,70 @@
         </div>`).join('') : '<div class="empty">No products yet.</div>'}
         <div><button class="btn primary" data-act="add-product">+ Add product</button></div>
       </section>`;
+    },
+
+    data() {
+      const mode = S.csvMode;
+      return `
+      <section class="card"><h2>Download a backup</h2>
+        <p class="hint">Saves everything (site title, theme colours, contact details, page text, services and products) as one CSV file. Keep it safe: after a redeploy, or a move to a new Vercel project, upload it here to restore your site. You can also edit it in Excel or Google Sheets and upload it again to change many things at once.</p>
+        <div><button class="btn primary" data-act="csv-download">Download CSV</button></div>
+        <p class="hint">Includes any unsaved changes shown in the editor. Image files are not inside the CSV, only their links.</p>
+      </section>
+      <section class="card"><h2>Upload a CSV</h2>
+        <fieldset class="modes">
+          <label class="radio"><input type="radio" name="csvmode" value="merge" ${mode === 'merge' ? 'checked' : ''}>
+            <span><b>Merge</b>: add and update the rows in the file. Blank cells keep the current value and nothing is deleted. Best for adding items in bulk.</span></label>
+          <label class="radio"><input type="radio" name="csvmode" value="replace" ${mode === 'replace' ? 'checked' : ''}>
+            <span><b>Replace</b>: make the site match the file. Blank cells are cleared, and services or products that are not in the file are removed. Best for restoring a backup.</span></label>
+        </fieldset>
+        <div><button class="btn ghost" data-act="csv-upload">Choose CSV file…</button></div>
+        ${S.csvPlan ? csvPreview() : ''}
+        <p class="hint">Nothing goes live until you press <b>Save changes</b>. Save Excel files as <b>CSV UTF-8</b> so Arabic and other non-English text stays intact.</p>
+      </section>
+      <section class="card"><h2>File format</h2>
+        <p class="hint">The first row is a header. Then one row per item:</p>
+        <table class="fmt">
+          <tr><th>type</th><th>Columns used</th></tr>
+          <tr><td><code>setting</code></td><td><code>key</code>, <code>value</code></td></tr>
+          <tr><td><code>service</code></td><td><code>id</code>, <code>title</code>, <code>summary</code>, <code>description</code>, <code>points</code> (one per line, <code>Heading: details</code>)</td></tr>
+          <tr><td><code>product</code></td><td><code>id</code>, <code>title</code> (the product name), <code>description</code>, <code>price</code>, <code>image</code> (a link)</td></tr>
+        </table>
+        <p class="hint">To add a new service or product, leave <code>id</code> blank. A row whose title matches an existing item updates it instead of creating a duplicate.</p>
+        <details><summary class="hint">Setting keys</summary><p class="hint keys">${RHCSV.KEYS.map((k) => `<code>${k}</code>`).join(' ')}</p></details>
+      </section>`;
     }
   };
+
+  function csvPreview() {
+    const p = RHCSV.apply(S.data, S.csvPlan.records, S.csvMode);
+    const st = p.stats;
+    const lines = [
+      `<li><b>${st.settings}</b> setting${st.settings === 1 ? '' : 's'} changed</li>`,
+      `<li>Services: <b>${st.service.added}</b> added, <b>${st.service.updated}</b> updated, <b>${st.service.removed}</b> removed</li>`,
+      `<li>Products: <b>${st.product.added}</b> added, <b>${st.product.updated}</b> updated, <b>${st.product.removed}</b> removed</li>`
+    ];
+    const w = p.warnings;
+    return `
+      <div class="csv-preview">
+        <strong>${esc(S.csvPlan.fileName)}</strong>
+        <ul>${lines.join('')}</ul>
+        ${w.length ? `<div class="warns"><b>${w.length} warning${w.length === 1 ? '' : 's'}</b><ul>${w.slice(0, 15).map((x) => `<li>${esc(x)}</li>`).join('')}${w.length > 15 ? `<li>…and ${w.length - 15} more</li>` : ''}</ul></div>` : ''}
+        <div class="row-actions">
+          <button class="btn primary" data-act="csv-apply">Apply to editor</button>
+          <button class="btn ghost" data-act="csv-cancel">Cancel</button>
+        </div>
+      </div>`;
+  }
+
+  function downloadCSV() {
+    const blob = new Blob([RHCSV.toCSV(S.data)], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `site-data-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
 
   function render() {
     document.querySelectorAll('#tabs button').forEach((b) => b.classList.toggle('on', b.dataset.tab === S.tab));
@@ -257,6 +319,10 @@
       : `<span class="pv-mark">${esc((s.title || '?').trim().charAt(0).toUpperCase())}</span>${esc(s.title)}`;
   }
 
+  $('#panel').addEventListener('change', (e) => {
+    if (e.target.name === 'csvmode') { S.csvMode = e.target.value; render(); }
+  });
+
   /* ---------- input handling ---------- */
   $('#panel').addEventListener('input', (e) => {
     const el = e.target;
@@ -285,10 +351,10 @@
   });
 
   /* ---------- images ---------- */
-  function pickFile() {
+  function pickFile(accept) {
     return new Promise((resolve) => {
       const i = document.createElement('input');
-      i.type = 'file'; i.accept = 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml';
+      i.type = 'file'; i.accept = accept || 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml';
       i.onchange = () => resolve(i.files[0] || null);
       i.click();
     });
@@ -357,6 +423,22 @@
         if (url) { S.data.products[i].image = url; setDirty(true); render(); }
       } else if (act === 'clear-product-img') {
         S.data.products[i].image = ''; setDirty(true); render();
+      } else if (act === 'csv-download') {
+        downloadCSV();
+      } else if (act === 'csv-upload') {
+        const file = await pickFile('.csv,text/csv,text/plain,application/vnd.ms-excel');
+        if (!file) return;
+        if (file.size > 2e6) throw new Error('That file is too large (max 2 MB).');
+        const records = RHCSV.toRecords(RHCSV.parseCSV(await file.text()));
+        if (!records.length) throw new Error('No data rows were found in that file.');
+        S.csvPlan = { fileName: file.name, records };
+        render();
+      } else if (act === 'csv-apply') {
+        const plan = RHCSV.apply(S.data, S.csvPlan.records, S.csvMode);
+        S.data = plan.data; S.csvPlan = null; setDirty(true); render();
+        toast('Imported into the editor. Review it, then press Save changes.');
+      } else if (act === 'csv-cancel') {
+        S.csvPlan = null; render();
       }
     } catch (err) {
       if (err.message !== 'Session expired') toast(err.message, true);

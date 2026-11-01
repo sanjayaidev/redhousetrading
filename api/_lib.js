@@ -147,6 +147,18 @@ export function sanitizeSite(input, current) {
     mapPointer: str(c.mapPointer, 200)
   };
 
+  // Page copy (editable via CSV import). Missing fields keep their current value.
+  const PAGE_COPY = {
+    home: ['headline', 'sub', 'cta', 'overviewTitle'],
+    contactPage: ['headline'],
+    about: ['legacyTitle', 'legacy', 'nextTitle', 'next', 'futureTitle', 'future', 'mission', 'vision']
+  };
+  for (const [sec, keys] of Object.entries(PAGE_COPY)) {
+    const inp = i[sec] && typeof i[sec] === 'object' ? i[sec] : {};
+    out[sec] = { ...(cur[sec] || {}) };
+    for (const k of keys) if (typeof inp[k] === 'string') out[sec][k] = str(inp[k], 2000);
+  }
+
   const list = (v, max) => (Array.isArray(v) ? v.slice(0, max) : []);
   out.services = list(i.services, 30).map((x) => ({
     id: id(x.id),

@@ -12,7 +12,22 @@ A static website (plain HTML/CSS/JS) for Vercel, with a password-protected admin
 | Services | Add, remove, reorder, edit (title, summary, description, key points) |
 | Products | Add, remove, reorder, edit (name, description, price, image). The Products menu link appears once there is at least one product |
 
+| Backup / CSV | Download everything as a CSV; upload a CSV to restore or bulk-edit (see below) |
+
 Empty contact fields are hidden on the site.
+
+## Backup, restore and bulk edit (CSV)
+
+Open **Backup / CSV** in the admin.
+
+- **Download CSV** exports the site title, tagline, logo link, theme colours, contact details, map, page text, all services and all products.
+- **Upload a CSV** shows a preview of what will change, then **Apply to editor**; nothing goes live until you press **Save changes**.
+  - **Merge**: adds and updates the rows in the file. Blank cells keep the current value; nothing is deleted. Use it to add products or services in bulk.
+  - **Replace**: makes the site match the file. Blank cells are cleared and services/products missing from the file are removed (a list is only replaced if the file has at least one row of that kind). Use it to restore a backup after a redeploy or when moving to a new Vercel project.
+
+Format: one header row `type,id,key,value,title,summary,description,points,price,image`, then one row per item. `setting` rows use `key` + `value`; `service` rows use `id,title,summary,description,points` (points one per line as `Heading: details`); `product` rows use `id,title,description,price,image`. Leave `id` blank for new items; a row whose title matches an existing item updates it rather than duplicating it. Excel and Google Sheets files work (save as **CSV UTF-8**; `;` and tab separators are detected). Phone numbers and other cells starting with `+ - = @` are exported with a leading `'` so spreadsheets do not treat them as formulas; the import removes it.
+
+Images are stored as links, not inside the CSV. If you move to a new Blob store, re-upload the logo and product images.
 
 ## Deploy on Vercel
 
@@ -42,5 +57,5 @@ Locally, edits are saved to `./.data` (git-ignored) instead of Blob. You can als
 ## Notes
 
 - **Contact form:** it opens the visitor's email app (to the address set in admin), or WhatsApp if only a mobile number is set. It does not store messages on a server.
-- **Page copy** (home headline, About text, mission/vision) lives in `data/site.json` and is not editable from the admin; edit that file and redeploy to change it.
+- **Page copy** (home headline, About text, mission/vision) has no form in the admin; change it by editing the `home.*`, `about.*` and `contactPage.*` rows of the CSV and uploading it, or by editing `data/site.json` (the starting content used before the first save).
 - `_legacy/` holds the files from the original repo; it is excluded from deployment (`.vercelignore`) and can be deleted.
