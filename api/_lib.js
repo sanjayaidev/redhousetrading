@@ -7,7 +7,8 @@ import { put, get } from '@vercel/blob';
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DATA_KEY = 'site-data.json';
 const LOCAL_DIR = path.join(ROOT, '.data');
-const hasBlob = () => !!process.env.BLOB_READ_WRITE_TOKEN;
+// Blob is available with either the classic token or the newer store-id + OIDC setup.
+const hasBlob = () => !!(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
 const onVercel = () => !!process.env.VERCEL;
 
 /* ---------------- auth ---------------- */
