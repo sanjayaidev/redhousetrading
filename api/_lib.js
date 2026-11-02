@@ -10,6 +10,9 @@ const LOCAL_DIR = path.join(ROOT, '.data');
 // Blob is available with either the classic token or the newer store-id + OIDC setup.
 const hasBlob = () => !!(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
 const onVercel = () => !!process.env.VERCEL;
+// Must match how the Blob store was created. Private is the default for new stores;
+// set BLOB_ACCESS=public in Vercel only if your store is Public.
+const ACCESS = process.env.BLOB_ACCESS === 'public' ? 'public' : 'private';
 
 /* ---------------- auth ---------------- */
 const sha = (s) => crypto.createHash('sha256').update(String(s)).digest();
@@ -55,7 +58,7 @@ async function readSeed() {
 export async function readSite() {
   try {
     if (hasBlob()) {
-      const r = await get(DATA_KEY, { access: 'public', useCache: false });
+      const r = await get(DATA_KEY, { access: ACCESS, useCache: false });
       if (r && r.stream) return JSON.parse(await new Response(r.stream).text());
     } else if (!onVercel()) {
       return JSON.parse(await fs.readFile(path.join(LOCAL_DIR, 'site.json'), 'utf8'));
@@ -72,7 +75,7 @@ export async function writeSite(data) {
   const body = JSON.stringify(data, null, 2);
   if (hasBlob()) {
     await put(DATA_KEY, body, {
-      access: 'public',
+      access: ACCESS,
       contentType: 'application/json',
       addRandomSuffix: false,
       allowOverwrite: true,
@@ -93,8 +96,9 @@ export async function saveImage(buffer, contentType) {
   if (!ext) throw new Error('Unsupported image type');
   const name = `uploads/${Date.now()}-${crypto.randomBytes(4).toString('hex')}.${ext}`;
   if (hasBlob()) {
-    const r = await put(name, buffer, { access: 'public', contentType, addRandomSuffix: false });
-    return r.url;
+    const r = await put(name, buffer, { access: ACCESS, contentType, addRandomSuffix: false });
+    // Private blobs have no public URL, so they are served through /api/image.
+    return ACCESS === 'public' ? r.url : '/api/image?p=' + encodeURIComponent(name);
   }
   if (!onVercel()) {
     const file = path.join(LOCAL_DIR, name);
@@ -103,6 +107,17 @@ export async function saveImage(buffer, contentType) {
     return '/' + name;
   }
   throw new StorageError('Storage is not set up. Add a Blob store to this Vercel project (Storage tab) and redeploy.');
+}
+
+// Streams an uploaded image from a private store (used by /api/image).
+export async function readImage(pathname) {
+  if (!hasBlob() || !/^uploads\/[A-Za-z0-9._-]+$/.test(pathname)) return null;
+  try {
+    const r = await get(pathname, { access: ACCESS });
+    return r && r.stream ? r : null;
+  } catch {
+    return null;
+  }
 }
 
 /* ---------------- validation ---------------- */

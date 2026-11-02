@@ -33,7 +33,7 @@ Images are stored as links, not inside the CSV. If you move to a new Blob store,
 
 1. Push this folder to GitHub and import the repo in Vercel (framework preset: **Other**, no build command).
 2. **Environment variable:** Project → Settings → Environment Variables → add `ADMIN_PASS` (a long passphrase).
-3. **Storage:** Project → Storage → Create → **Blob** → choose **Public** access → connect it to the project. This adds `BLOB_READ_WRITE_TOKEN` automatically. (Vercel's filesystem is read-only, so Blob is where admin edits and uploaded images are saved.)
+3. **Storage:** Project → Storage → Create → **Blob** → connect it to the project. This adds `BLOB_STORE_ID` (or `BLOB_READ_WRITE_TOKEN`) automatically. Private stores work (uploaded images are served through `/api/image`); if your store is **Public**, also add the environment variable `BLOB_ACCESS=public`. (Vercel's filesystem is read-only, so Blob is where admin edits and uploaded images are saved.)
 4. Redeploy, then open `/admin` and sign in.
 
 Changing `ADMIN_PASS` later signs everyone out.
